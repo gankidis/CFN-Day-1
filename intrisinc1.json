@@ -1,0 +1,87 @@
+{
+    "AWSTemplateFormatVersion" : "2010-09-09",
+     "Description" : "GetAtt + Ref + Select +FindInMap + GetAZ + Join +Base64",
+     "Parameters": {
+		"VPC": {
+			"Type": "AWS::EC2::VPC::Id"
+		},
+		"SubnetA": {
+			"Type": "AWS::EC2::Subnet::Id"
+		},
+		"SubnetB": {
+			"Type": "AWS::EC2::Subnet::Id"
+		},
+		"KeyName": {
+			"Type": "AWS::EC2::KeyPair::KeyName",
+			"Default": "mykey"
+		}
+	},
+     "Mappings":{
+        "RegionMap" : {
+           "us-east-1"       : { "AMI" : "ami-0ff8a91507f77f867"},
+            "us-west-1"      : { "AMI" : "ami-0bdb828fd58c52235"},
+            "us-west-2"      : { "AMI" : "ami-a0cfeed8"},
+            "eu-west-1"      : { "AMI" : "ami-047bb4163c506cd98"},
+            "sa-east-1"      : { "AMI" : "ami-07b14488da8ea02a0"},
+            "ap-southeast-1" : { "AMI" : "ami-08569b978cc4dfa10"},
+            "ap-southeast-2" : { "AMI" : "ami-09b42976632b27e9b"},
+            "ap-northeast-1" : { "AMI" : "ami-06cd52961ce9f0d85"}
+            }
+     },
+     "Resources":{
+         "TestELB":{
+             "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
+             "Properties":{
+                "Listeners": [{
+					"LoadBalancerPort": "80",
+					"InstancePort": "80",
+					"Protocol": "HTTP"
+                }],
+                "Subnets":[{ "Ref":"SubnetA"}]
+             }
+         },
+         "TestEC2Instance":{
+            "Type" : "AWS::EC2::Instance",
+            "DependsOn" : "TestELB",
+            "Properties":{
+                "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ]},
+                "AvailabilityZone": {"Fn::Select" :[ "3",{ "Fn::GetAZs" : { "Ref" : "AWS::Region" } }],
+                "SubnetId" : {"Ref":"SubnetA"},
+                "KeyName" : {"Ref": "KeyName"},
+                "UserData": { 
+                    "Fn::Base64": {
+                        "Fn::Join":[
+                            "",[
+                        "#!/bin/bash -x\n",
+                        "cd /home/ec2-user\n",
+                        "sleep 60s\n",
+                        "sudo curl -ivk ",
+                        { "Fn::GetAtt" : [ "TestELB", "DNSName" ]},
+                        " -o please.txt\n",
+                        "/opt/aws/bin/cfn-signal -e $?",
+                        " --stack ",
+                        {
+                            "Ref": "AWS::StackName"
+                        },
+                        " --resource TestEC2Instance",
+                        " --region ",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "\n"   
+                         ]
+                        ]
+                      }
+                  }
+                },
+            "CreationPolicy":{
+               "ResourceSignal":{
+                "Count":1,
+                "Timeout":"PT5M"
+                 }
+                }
+            }
+         }
+
+
+     }
