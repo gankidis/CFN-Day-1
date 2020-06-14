@@ -246,11 +246,15 @@ Description: The intrinsic function Fn::Transform specifies a macro to perform c
 
 Syntax:
 ```
+YAML: 
+
 Fn::Transform:
 Name : macro name
 Parameters :
 Key : value
-	
+
+JSON:
+
 { "Fn::Transform" : { "Name" : macro name, "Parameters" : {key : value, ... } } }
 ```
 Parameters:
@@ -268,8 +272,11 @@ Description: The intrinsic function Ref returns the value of the specified param
 
 Syntax:
 ```
+YAML:
+
 !Ref logicalName
 
+JSON:
 	
 { "Ref" : "logicalName" }
 ```
