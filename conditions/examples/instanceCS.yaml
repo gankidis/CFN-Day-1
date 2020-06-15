@@ -9,6 +9,7 @@ Parameters:
       - t2.large
       - m5.large
       - r5.large
+      - t2.medium
     Description: Choose an compatible instance type
 
   KeyName:
