@@ -3,6 +3,7 @@
        "MyInstance": {
           "Type": "AWS::EC2::Instance",
           "Properties": {
+            "ImageId":"ami-0889b8a448de4fc44",
              "UserData": {
                  "Fn::Base64":{
                      "Fn::Join":["",[
