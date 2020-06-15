@@ -1,6 +1,4 @@
-# CloudFormation Training
-
-## Pseudo Parameters
+# Pseudo Parameters
 
 Parameters that are predifined by CloudFormation, and are provided to the stack resources during runtime.
 
@@ -62,7 +60,7 @@ Returns the name of the stack
 Returns the suffix for a domain. The suffix is typically amazonaws.com, but might differ by region. For example, the suffix for the China (Beijing) region is amazonaws.com.cn. 
 
 
-Uses :
+## Examples
 
 - ARN generation
 ```
@@ -95,7 +93,7 @@ Outputs:
                 - !Ref 'AWS::URLSuffix'
 ```
 
-## Conditions and Conditional Resource Creation
+# Conditions and Conditional Resource Creation
 
 You can use intrinsic functions, such as Fn::If, Fn::Equals, and Fn::Not, to conditionally create stack resources. These conditions are evaluated based on input parameters that you declare when you create or update a stack. 
 
@@ -161,7 +159,7 @@ Resources:
               - 'sts:AssumeRole'
 ```
 
-## Change Sets
+# Change Sets
 
 - Change Set Overview
 
@@ -173,7 +171,7 @@ Resources:
 - Execute Change Set
 - Delete Change Set
 
-## CloudFormation APIs
+# CloudFormation APIs
 
 - CreateStack
 - UpdateStack
@@ -182,9 +180,9 @@ Resources:
 - DescribeStackResource
 - DescribeStackResources
 - CreateChangeSet
+- DescribeChangeSet
 - ExecuteChangeSet
 - DeleteChangeSet
-
 
 ## Task 
 - Create two stacks using a single template with an SQS queue, that should be only created if 
