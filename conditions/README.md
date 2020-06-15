@@ -185,8 +185,25 @@ Resources:
 - DeleteChangeSet
 
 ## Task 
-- Create two stacks using a single template with an SQS queue, that should be only created if 
-  - Environment is dev or qa, amongst the three environments[prod, dev, qa, uat]
-  - Region is us-east-2 and us-west-1
-  - Output the queue ARN for both the queues
-  - Output the service endpoints for the resources created in both the regions.
+- Create two stacks using a single template with an EC2 instance resource in a public subnet, which has dynamic parameters which you can pass during runtime.
+
+- Use an "Environment" parameter, which has allowed values [qa, prod, dev, test]
+
+- Use mappings to define RegionMap top level key for us-east-1 and us-west-1 regions
+
+- if the environment is dev, stack should be created in us-east-1 region, with an AMI available in that region and instance type should be t2.small.
+
+- if the environment is prod, stack should be created in us-west-1 region, with an AMI available in that region and instance type should be t2.large.
+
+- if the environment is qa or uat, the stack should skip resource creation.
+
+- Use conditions to separate resource creation for different regions, with imageId and instance type properties based on the conditions and mappings given above.
+ 
+- Output the public IP of the instances. 
+
+- Output the service endpoints for the region, in which the stack is deployed.
+
+Once you have successfully created a template, paste the template snippet in the below given link and share it with us :
+
+### https://code.amazon.com/
+
