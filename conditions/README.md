@@ -187,7 +187,7 @@ Resources:
 ## Task 
 - Create two stacks using a single template with an EC2 instance resource in a public subnet, which has dynamic parameters which you can pass during runtime.
 
-- Use an "Environment" parameter, which has allowed values [qa, prod, dev, test]
+- Use an "Environment" parameter, which has allowed values [qa, prod, dev, uat]
 
 - Use mappings to define RegionMap top level key for us-east-1 and us-west-1 regions
 
