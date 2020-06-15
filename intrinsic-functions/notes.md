@@ -27,6 +27,33 @@ valueToEncode: The string value you want to convert to Base64.
 
 Return Value: The original string, in Base64 representation.
 
+Example:
+```
+{
+    "Resources": {
+       "MyInstance": {
+          "Type": "AWS::EC2::Instance",
+          "Properties": {
+             "UserData": {
+                 "Fn::Base64":{
+                     "Fn::Join":["",[
+                         " #!/bin/bash -xe\n",
+                         "yum update -y\n",
+                         "yum install -y\n",
+                         "httpd\n",
+                         "mariadb-server\n",
+                         "php\n"
+                     ]]
+                 }
+                
+                }
+             
+          }
+       }
+    }
+}
+```
+
 Fn::Cidr
 ---
 
@@ -277,7 +304,7 @@ YAML:
 !Ref logicalName
 
 JSON:
-	
+
 { "Ref" : "logicalName" }
 ```
 Parameters:
