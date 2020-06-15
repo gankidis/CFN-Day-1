@@ -205,5 +205,5 @@ Resources:
 
 Once you have successfully created a template, paste the template snippet in the below given link and share it with us :
 
-### https://code.amazon.com/
+### https://paste.amazon.com/
 
