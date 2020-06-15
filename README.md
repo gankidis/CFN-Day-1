@@ -10,7 +10,7 @@ AWS::EC2::Instance)
 
 3) Psuedo-parameters
 
-4) Understanding Conditions and Conditional Resource Creation.
+4) Understanding Conditions and Conditional Resource Creation
 
 5)Understanding the CloudFormation APIs
 
