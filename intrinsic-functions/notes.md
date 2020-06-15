@@ -52,8 +52,22 @@ Example:
        }
     }
 }
-```
 
+or 
+
+Resources:
+          myInstance:
+            Type: AWS::EC2::Instance
+            Properties:
+              UserData:
+                Fn::Base64: !Sub | #updates and install https, mariadb-server and php
+                  #!/bin/bash -xe
+                  yum update -y
+                  yum install -y \
+                    httpd \
+                    mariadb-server \
+                    php
+```
 Fn::Cidr
 ---
 
@@ -85,6 +99,22 @@ cidrBits: The number of subnet bits for the CIDR. 32-x where x = cidrBits
 
 Return Value: An array of CIDR address blocks.
 
+Example:
+
+```
+Resources: 
+          myVPC:
+            Type: AWS::EC2::VPC
+            Properties:
+              CidrBlock: "10.0.0.0/16"
+          mySubnet:
+            Type: AWS::EC2::Subnet
+            Properties:
+              CidrBlock: !Select [ 1, Fn::Cidr [ !GetAtt myVPC.CidrBlock, 2, 8 ]] #returns 10.0.0.1/24 and 10.0.0.2/24
+              VpcId: !Ref myVPC
+```
+
+
 Fn::FindInMap
 ---
 Description: The intrinsic function Fn::FindInMap returns the value corresponding to keys in a two-level map that is declared in the Mappings section.
@@ -108,6 +138,27 @@ TopLevelKey: The top-level key name. Its value is a list of key-value pairs.
 SecondLevelKey: The second-level key name, which is set to one of the keys from the list assigned to TopLevelKey.
 
 Return Value: The value that is assigned to SecondLevelKey.
+
+Example:
+```
+    Mappings: 
+          RegionMap: 
+            us-east-1: 
+              HVM64: "ami-1"
+              HVMG2: "ami-2"
+            us-west-1: 
+              HVM64: "ami-3"
+              HVMG2: "ami-4"
+        Resources: 
+          myEC2Instance: 
+            Type: "AWS::EC2::Instance"
+            Properties: 
+              ImageId: !FindInMap ##if region = us-east-1, returns ami-2
+                - RegionMap
+                - !Ref 'AWS::Region' 
+                - HVMG2
+```
+
 
 Fn::GetAtt
 ---
@@ -134,6 +185,22 @@ attributeName: The name of the resource-specific attribute whose value you want.
 
 Return Value: The attribute value.
 
+Example:
+
+```
+  Resources: 
+          myVPC:
+            Type: AWS::EC2::VPC
+            Properties:
+              CidrBlock: "10.0.0.0/16"
+          mySubnet:
+            Type: AWS::EC2::Subnet
+            Properties:
+              CidrBlock: !Select [ 1, Fn::Cidr [ !GetAtt myVPC.CidrBlock, 2, 8 ]] #returns 10.0.0.1/24 and 10.0.0.2/24
+              VpcId: !Ref myVPC
+```
+
+
 Fn::GetAZs
 ---
 
@@ -154,6 +221,26 @@ Parameters:
 region: The name of the region for which you want to get the Availability Zones.
 
 Return Value: The list of Availability Zones for the region.
+
+Example:
+
+```
+    Resources: 
+          myAvailabilityZone: !Select 
+            - 1
+            - Fn::GetAZs: !Ref 'AWS::Region' #if region = us-east-1, returns us-east-1b
+          myVPC:
+            Type: AWS::EC2::VPC
+            Properties:
+              CidrBlock: "10.0.0.0/16"
+          mySubnet: 
+            Type: "AWS::EC2::Subnet"
+            Properties: 
+              VpcId: 
+                !Ref myVPC
+              CidrBlock: 10.0.0.0/24
+              AvailabilityZone: !Ref myAvailabilityZone
+```
 
 Fn::ImportValue
 ---
@@ -177,6 +264,13 @@ sharedValueToImport: The stack output value that you want to import.
 
 Return Value: The stack output value.
 
+Example:
+
+```
+ Fn::ImportValue:
+          !Sub "${NetworkStackName}-SecurityGroupID"
+```
+
 Fn::Join
 ---
 
@@ -199,6 +293,12 @@ ListOfValues: The list of values you want to be combined.
 
 Return Value: The combined string.
 
+Example:
+```
+Fn::Join: [ ":", [ a, b, c ] ] #returns a:b:c
+
+```
+
 Fn::Select
 ---
 
@@ -220,6 +320,20 @@ listOfObjects: The list of objects to select from. This list must not be null, n
 
 Return Value: The selected object.
 
+Example:
+```
+Resources: 
+          myVPC:
+            Type: AWS::EC2::VPC
+            Properties:
+              CidrBlock: "10.0.0.0/16"
+          mySubnet:
+            Type: AWS::EC2::Subnet
+            Properties:
+              CidrBlock: !Select [ 1, Fn::Cidr [ !GetAtt myVPC.CidrBlock, 2, 8 ]] #returns 10.0.0.1/24 and 10.0.0.2/24
+              VpcId: !Ref myVPC
+```
+
 Fn::Split
 ---
 
@@ -240,6 +354,12 @@ delimiter: A string value that determines where the source string is divided.
 source string: The string value that you want to split.
 
 Return Value: A list of string values.
+
+Example:
+
+```
+ Fn::Split: [ ":", "a:b:c" ] #returns [a,b,c]
+```
 
 Fn::Sub
 ---
@@ -265,6 +385,18 @@ VarName: The name of a variable that you included in the String parameter.
 VarValue: The value that AWS CloudFormation substitutes for the associated variable name at runtime.
 
 Return Value: AWS CloudFormation returns the original string, substituting the values for all of the variables.
+
+Example:
+
+```
+UserData:
+          Fn::Base64:
+            !Sub |
+              #!/bin/bash -xe
+              yum update -y aws-cfn-bootstrap
+              /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LaunchConfig --configsets wordpress_install --region ${AWS::Region}
+              /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WebServerGroup --region ${AWS::Region}
+```
 
 Fn::Transform
 ---
@@ -292,6 +424,14 @@ Parameters: The list parameters, specified as key-value pairs, to pass to the ma
 
 Return Value: The processed template snippet to be included in the processed stack template.
 
+Example:
+
+```
+ 'Fn::Transform':
+            Name: 'AWS::Include'
+            Parameters: {Location: {'Fn::FindInMap': [RegionMap, us-east-1, s3Location]}}
+```
+
 Ref
 ---
 
@@ -312,3 +452,17 @@ Parameters:
 logicalName: The logical name of the resource or parameter you want to dereference.
 
 Return Value: The physical ID of the resource or the value of the parameter.
+
+Example:
+```
+Resources: 
+          myVPC:
+            Type: AWS::EC2::VPC
+            Properties:
+              CidrBlock: "10.0.0.0/16"
+          mySubnet:
+            Type: AWS::EC2::Subnet
+            Properties:
+              CidrBlock: !Select [ 1, Fn::Cidr [ !GetAtt myVPC.CidrBlock, 2, 8 ]] #returns 10.0.0.1/24 and 10.0.0.2/24
+              VpcId: !Ref myVPC
+```
