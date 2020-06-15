@@ -1,0 +1,52 @@
+
+    "Parameters": {
+        "MyBucketName": {
+            "Type": "String",
+            "Description": "Name of S3 bucket to create",
+            "AllowedPattern": "^[a-z0-9][a-z0-9-.]*$",
+            "MinLength": 3,
+            "MaxLength": 63,
+            "ConstraintDescription": "Please provide a valid S3 bucket name"
+        }
+    },
+    "Resources": {
+        "MyS3Bucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "BucketName": {
+                    "Ref": "MyBucketName"
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "MyBucketURL": {
+            "Description": "The website endpoint for the MyS3Bucket resource",
+            "Value": {
+                "Fn::GetAtt": [
+                    "MyS3Bucket",
+                    "DomainName"
+                ]
+            }
+        },
+        "MyOutputString": {
+            "Description": "An example string",
+            "Value": {
+                "Fn::Join": [
+                    " ",
+                    [
+                        "The",
+                        {
+                            "Ref": "MyBucketName"
+                        },
+                        "bucket is located in the",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "region"
+                    ]
+                ]
+            }
+        }
+    }
+}
