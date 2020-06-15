@@ -2,7 +2,7 @@ TOPICS:
 ---
 
 1) Template Anatomy
-• Defining a basic resource
+ Defining a basic resource
 (AWS::S3::Bucket,
 AWS::EC2::Instance)
 
