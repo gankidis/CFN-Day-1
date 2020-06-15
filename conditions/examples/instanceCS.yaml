@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Template to provision an EC2 instance.
+
+Parameters:
+  InstanceType:
+    Default: t2.large
+    Type: String
+    AllowedValues:
+      - t2.large
+      - m5.large
+      - r5.large
+    Description: Choose an compatible instance type
+
+  KeyName:
+    Type: 'AWS::EC2::KeyPair::KeyName'
+    Description: Choose the keypair for SSH access
+
+  VPC:
+    Type: 'AWS::EC2::VPC::Id'
+    Description: Choose the VPC to launch the instance into.
+
+  BaseSG:
+    Type: 'AWS::EC2::SecurityGroup::Id'
+    Description: Choose the SG to associated with the instance
+
+  SubnetId:
+    Type: 'AWS::EC2::Subnet::Id'
+    Description: Choose the subnet to place the instance into.
+
+  ImageId:
+    Type: String
+    Default: ami-0ff8a91507f77f867
+    Description: Image ID to be used.
+
+Resources:
+  Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      SubnetId: !Ref SubnetId
+      ImageId: !Ref ImageId
+      KeyName: !Ref KeyName
+      InstanceType: !Ref InstanceType
+      SecurityGroupIds:
+        - !Ref BaseSG
+      Tags:
+        - Key: "Name"
+          Value: "testInstance"
+        - Key: "Owner"
+          Value: !Ref 'AWS::AccountId'
+
+Outputs:
+  InstanceIp:
+    Description : Public IP address of the instance.
+    Value: !GetAtt Instance.PublicIp

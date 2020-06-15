@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: SQS  definition
+
+Parameters:
+  Name:
+    Type: String
+    Default: test-queue1
+
+Resources:
+  testQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: !Ref Name
+
+Outputs:
+  RoleArn:
+    Value: !Sub 'arn:${AWS::Partition}:events:${AWS::AccountId}:rule/ExampleRule'
+  QueueServiceEndpoint:
+    Value: !Join 
+      - ''
+      - - 'https://'
+        - sqs.
+        - !Ref 'AWS::Region'
+        - .
+        - !Ref 'AWS::URLSuffix'

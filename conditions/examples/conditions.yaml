@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Conditions:
+  createRoleEast1: !Equals [!Ref "AWS::Region", "us-east-1"]
+  createRoleEast2: !Equals [!Ref "AWS::Region", "us-east-2"]
+
+Resources:
+  RootRoleEast1:
+    Condition: createRoleEast1
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub test-role-${AWS::Region}
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: '*'
+                Resource: '*'
+
+  RootRoleEast2:
+    Condition: createRoleEast2
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub test-role-${AWS::Region}
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - ecs.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      
