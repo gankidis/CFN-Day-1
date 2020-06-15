@@ -1,6 +1,6 @@
 # Pseudo Parameters
 
-Parameters that are predifined by CloudFormation, and are provided to the stack resources during runtime.
+Parameters that are predefined by CloudFormation, and are provided to the stack resources during runtime.
 
 List of Pseudo parameters that are applied by CloudFormation, when referenced in templates:
 ---
