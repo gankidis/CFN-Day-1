@@ -23,7 +23,7 @@ Parameters:
 
   BaseSG:
     Type: 'AWS::EC2::SecurityGroup::Id'
-    Description: Choose the SG to associated with the instance
+    Description: Choose the SG to associate with the instance
 
   SubnetId:
     Type: 'AWS::EC2::Subnet::Id'
