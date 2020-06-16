@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: Template to provision an EC2 instance.
+
+Parameters:
+  Environment:
+    Default: dev
+    Type: String
+    AllowedValues:
+      - dev
+      - qa
+      - prod
+      - uat
+    Description: Choose an environment to deploy your instance.
+
+  KeyName:
+    Type: 'AWS::EC2::KeyPair::KeyName'
+    Description: Choose the keypair for SSH access
+
+  VPC:
+    Type: 'AWS::EC2::VPC::Id'
+    Description: Choose the VPC to launch the instance into.
+
+  BaseSG:
+    Type: 'AWS::EC2::SecurityGroup::Id'
+    Description: Choose the SG to associated with the instance
+
+  SubnetId:
+    Type: 'AWS::EC2::Subnet::Id'
+    Description: Choose the subnet to place the instance into.
+
+Mappings: 
+  RegionMap: 
+    us-east-1: 
+      Env: dev
+      AMI: "ami-0ff8a91507f77f867"
+      Type: t2.small
+    us-west-1: 
+      Env: prod
+      AMI: "ami-0bdb828fd58c52235" 
+      Type: t2.large  
+
+Conditions:
+  CreateProdResources: !And
+      - !Equals [!Ref Environment, prod]
+      - !Equals [!Ref AWS::Region, "us-west-1"]
+      
+  CreateDevResources: !And
+      - !Equals [!Ref Environment, dev]
+      - !Equals [!Ref AWS::Region, "us-east-1"]
+
+  DevOrProdCondition: !Or [Condition: CreateProdResources, Condition: CreateDevResources]
+
+Resources:
+  Instance:
+    Condition: DevOrProdCondition
+    Type: AWS::EC2::Instance
+    Properties:
+      SubnetId: !Ref SubnetId
+      ImageId: !If [CreateProdResources, !FindInMap [RegionMap, "us-west-1", AMI], !FindInMap [RegionMap, "us-east-1", AMI]]
+      InstanceType: !If [CreateProdResources, !FindInMap [RegionMap, "us-west-1", Type], !FindInMap [RegionMap, "us-east-1", Type]]
+      SecurityGroupIds:
+        - !Ref BaseSG
+      Tags:
+        - Key: "Name"
+          Value: "testInstance"
+        - Key: "Owner"
+          Value: !Ref 'AWS::AccountId'
+
+Outputs:
+  InstanceIp:
+    Condition: DevOrProdCondition
+    Description : Public IP address of the instance.
+    Value: !GetAtt Instance.PublicIp
+  ServiceEndPoint:
+    Condition: DevOrProdCondition
+    Value: !Join
+          - ''
+          - - 'https://'
+            - 'ec2.'
+            - !Ref 'AWS::Region'
+            - '.'
+            - !Ref 'AWS::URLSuffix'
+
+
