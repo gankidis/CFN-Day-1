@@ -32,11 +32,9 @@ Parameters:
 Mappings: 
   RegionMap: 
     us-east-1: 
-      Env: dev
       AMI: "ami-0ff8a91507f77f867"
       Type: t2.small
     us-west-1: 
-      Env: prod
       AMI: "ami-0bdb828fd58c52235" 
       Type: t2.large  
 
